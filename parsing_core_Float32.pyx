@@ -274,7 +274,7 @@ cdef extern from "rxs_parsing_core/ModularPicoScenesFrame.hxx":
         optional[CSISegment] legacyCSISegment
         optional[BasebandSignalSegment] basebandSignalSegment
         optional[PreEQSymbolsSegment] preEQSymbolsSegment
-        vector[uint8_t] mpdu
+        vector[uint8_t] mpdus[0]
 
         @ staticmethod
         optional[ModularPicoScenesRxFrame] fromBuffer(const uint8_t *buffer, uint32_t bufferLength, bint interpolateCSI)
@@ -345,8 +345,6 @@ cdef class Parsing_core_Float32:
         free(buf)
         fclose(f)
         self.count = count
-        if self.if_report:
-            printf("%d packets parsed\n", count)
 
     cpdef pmsg(self, unsigned char *data):
         # This method hasn't been ready
@@ -563,19 +561,12 @@ cdef parse(optional[ModularPicoScenesRxFrame] *frame):
             data["PicoScenesHeader"] = parse_PicoScenesFrameHeader(&frame_value.PicoScenesHeader.value())
         if frame_value.txExtraInfoSegment.has_value():
             data["TxExtraInfo"] = parse_ExtraInfo(&frame_value.txExtraInfoSegment.value().getExtraInfo())
-        if frame_value.pilotCSISegment.has_value():
-            data["PilotCSI"] = parse_CSI(&frame_value.pilotCSISegment.value().getCSI())
         if frame_value.legacyCSISegment.has_value():
             data["LegacyCSI"] = parse_CSI(&frame_value.legacyCSISegment.value().getCSI())
         if frame_value.basebandSignalSegment.has_value():
             data["BasebandSignals"] = parse_Float32SignalMatrix(&frame_value.basebandSignalSegment.value().getFloat32SignalMatrix())
-        if frame_value.preEQSymbolsSegment.has_value():
-            data["PreEQSymbols"] = parse_SignalMatrix(&frame_value.preEQSymbolsSegment.value().getPreEqSymbols())
-        # if frame_value.dpasRequestSegment.has_value():
-        #     data["DpasRequestSegment"] = parse_DpasRequestSegment(
-        #         frame_value.dpasRequestSegment.value().getRequest())
 
-        data["MPDU"] = frame_value.mpdu
+        # data["MPDU"] = frame_value.mpdus[0].data()
 
     # print(data)
     return data
