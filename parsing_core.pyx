@@ -271,7 +271,7 @@ cdef extern from "rxs_parsing_core/ModularPicoScenesFrame.hxx":
         optional[ExtraInfoSegment] txExtraInfoSegment
         optional[CSISegment] legacyCSISegment
         optional[BasebandSignalSegment] basebandSignalSegment
-        vector[uint8_t] mpdus[0]
+        vector[vector[uint8_t]] mpdus
 
         @ staticmethod
         optional[ModularPicoScenesRxFrame] fromBuffer(const uint8_t *buffer, uint32_t bufferLength, bint interpolateCSI)
@@ -563,7 +563,7 @@ cdef parse(optional[ModularPicoScenesRxFrame] *frame):
         if frame_value.basebandSignalSegment.has_value():
             data["BasebandSignals"] = parse_SignalMatrix(&frame_value.basebandSignalSegment.value().getSignalMatrix())
 
-        # data["MPDU"] = frame_value.mpdus.data()
+        data["MPDUS"] = frame_value.mpdus
 
     # print(data)
     return data
