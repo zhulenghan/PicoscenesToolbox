@@ -29,7 +29,7 @@ class Build(build_ext):
                     e.extra_compile_args = ['/std:c++latest']
         else:
             for e in self.extensions:
-                if e.name == "parsing_core" or "picoscenes":
+                if e.name == "parsing_core_Float32" or "parsing_core" or "picoscenes":
                     e.extra_compile_args = ['-std=c++2a', '-Wno-attributes',
                                             '-O3']
         super(Build, self).build_extensions()
